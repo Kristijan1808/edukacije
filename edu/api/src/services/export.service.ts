@@ -1,7 +1,7 @@
 import archiver from 'archiver';
 import type { Response } from 'express';
-import PptxGenJS from 'pptxgenjs';
 import { prisma } from '../config/prisma.js';
+import PptxGenJS from 'pptxgenjs';
 
 export async function exportCourseToPptx(courseId: string, res: Response): Promise<void> {
   const course = await prisma.course.findUniqueOrThrow({
@@ -9,7 +9,7 @@ export async function exportCourseToPptx(courseId: string, res: Response): Promi
     include: { lessons: { orderBy: { order: 'asc' } } },
   });
 
-  const pptx = new PptxGenJS();
+  let pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';
 
   for (const lesson of course.lessons) {

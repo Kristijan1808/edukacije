@@ -7,7 +7,7 @@ function createToken(user: { id: string; email: string; role: string }): string 
   return jwt.sign({ sub: user.id, email: user.email, role: user.role }, env.jwtSecret, { expiresIn: '7d' });
 }
 
-export async function registerUser(input: { email: string; password: string; name?: string }) {
+export async function registerUser(input: { email: string; password: string; name: string }) {
   const user = await prisma.user.create({
     data: {
       email: input.email,
