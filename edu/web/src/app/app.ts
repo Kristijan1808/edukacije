@@ -7,7 +7,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 type Block={id:string,type:string,data:any}; type Lesson={id?:string,title:string,durationMin:number,content:Block[]};
 @Component({selector:'app-root',standalone:true,imports:[CommonModule,FormsModule,DragDropModule],templateUrl:'./app.html',styleUrl:'./app.scss'})
 export class App{
- private http=inject(HttpClient); api='http://localhost:3000/api'; view=signal<'login'|'dashboard'|'editor'|'templates'|'reports'>('login'); user=signal<any>(null); courses=signal<any[]>([]); templates=signal<any[]>([]); active=signal<any>(null); activeLesson=signal(0); saving=signal(false); toast=signal('');
+ private http=inject(HttpClient); api='https://edukacije.onrender.com/api'; view=signal<'login'|'dashboard'|'editor'|'templates'|'reports'>('login'); user=signal<any>(null); courses=signal<any[]>([]); templates=signal<any[]>([]); active=signal<any>(null); activeLesson=signal(0); saving=signal(false); toast=signal('');
  email='demo@edustudio.local'; password='demo1234'; name=''; registerMode=false; search=''; aiText='';
  palette=[['text','Tekst','T'],['image','Slika','▧'],['button','Tipka','↗'],['single','Single choice','◉'],['multi','Multi choice','☑'],['textarea','Pisani odgovor','≡'],['matching','Spajanje pojmova','⇄'],['dropzone','Box u box','⬚']];
  filtered=computed(()=>this.courses().filter(c=>c.title.toLowerCase().includes(this.search.toLowerCase())));
