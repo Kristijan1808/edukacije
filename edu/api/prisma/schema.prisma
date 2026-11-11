@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  AUTHOR
+  LEARNER
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum QuestionType {
+  SINGLE
+  MULTI
+  TEXT
+  MATCHING
+  IMAGE
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         Role      @default(AUTHOR)
+  createdAt    DateTime  @default(now())
+  courses      Course[]
+  attempts     Attempt[]
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  title       String
+  description String       @default("")
+  status      CourseStatus @default(DRAFT)
+  theme       Json?
+  settings    Json?
+  ownerId     String
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  quizzes     Quiz[]
+  enrollments Enrollment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Lesson {
+  id          String @id @default(cuid())
+  title       String
+  order       Int
+  content     Json
+  durationMin Int    @default(5)
+  courseId    String
+  course      Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model Quiz {
+  id                  String    @id @default(cuid())
+  title               String
+  passPercent         Int       @default(70)
+  randomQuestionCount Int?
+  shuffleQuestions    Boolean   @default(true)
+  shuffleAnswers      Boolean   @default(true)
+  showFeedback        Boolean   @default(true)
+  courseId            String
+  course              Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions           Question[]
+  attempts            Attempt[]
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  type        QuestionType
+  prompt      String
+  explanation String       @default("")
+  points      Int          @default(1)
+  config      Json
+  quizId      String
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id           String    @id @default(cuid())
+  courseId     String
+  course       Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  learnerEmail String
+  learnerName  String?
+  status       String    @default("ASSIGNED")
+  score        Float?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@unique([courseId, learnerEmail])
+}
+
+model Attempt {
+  id           String   @id @default(cuid())
+  quizId       String
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  learnerEmail String?
+  answers      Json
+  score        Float
+  passed       Boolean
+  startedAt    DateTime @default(now())
+  completedAt  DateTime @default(now())
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  category    String
+  thumbnail   String?
+  courseData  Json
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Asset {
+  id        String   @id @default(cuid())
+  name      String
+  mimeType  String
+  size      Int
+  path      String
+  createdAt DateTime @default(now())
+}
